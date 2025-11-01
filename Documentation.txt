@@ -1,0 +1,114 @@
+NLP Assignment 2 Documentation
+============================
+
+1. Data Collection & Preprocessing
+--------------------------------
+a) Legal Dataset Collection
+   - Just used the PDFs given by the instructor in Assignment
+
+b) PDF to Text Conversion (convertPDF.py)
+   - Used pdf2image and pytesseract for OCR
+   - Converted PDFs to images page by page to manage memory
+   - Extracted text using OCR and saved as JSON
+   - Output: processed_data_ocr_parallel/all_cases.json
+
+c) Data Merging
+   - Merged OCR results with existing case metadata
+   - Combined all_cases.json with data.json
+   - Output: processed_data_ocr_parallel/merged_all.json
+
+2. Text Processing & Preprocessing
+--------------------------------
+a) Sentence Segmentation
+   - Split documents into sentences
+   - Cleaned and normalized text
+   - Handled legal document specific formatting
+   - Output: processed_sentences/merged_sentences_nested.json
+
+3. Word Embeddings (CBOW Model)
+------------------------------
+a) CBOW Implementation
+   - Created Continuous Bag of Words (CBOW) model
+   - Used sliding window approach for context words
+   - Implemented negative sampling
+   - Training parameters:
+     * Window size: 5
+     * Embedding dimension: 100
+     * Learning rate: 0.01
+
+b) Model Training
+   - Trained on preprocessed legal text corpus
+   - Saved trained weights:
+     * W1_shared.npy: Input-to-hidden weights
+     * W2_shared.npy: Hidden-to-output weights
+
+4. Extractive Summarization
+--------------------------
+a) Implementation (extractive_summarization.py)
+   - Used trained word embeddings for sentence representation
+   - Document representation: mean of sentence vectors
+   - Ranking: cosine similarity between sentence and document vectors
+   - Selected top-K sentences maintaining original order
+   - Parameters:
+     * TOP_K = 3 (sentences per summary)
+     * MIN_WORDS_FOR_SENT = 3 (minimum words per sentence)
+
+b) Fragment Handling
+   - Implemented smart merging of sentence fragments
+   - Handled special cases like numbering and abbreviations
+   - Improved readability of final summaries
+
+5. Output & Results
+------------------
+- Directory Structure:
+  * processed_data_ocr_parallel/: OCR results
+  * training_data/: CBOW model files
+  * summaries/: Generated extractive summaries
+  * scripts/: Python implementation files
+
+- Key Files:
+  * convertPDF.py: PDF processing and OCR
+  * extractive_summarization.py: Summarization implementation
+  * W1_shared.npy, W2_shared.npy: Trained embeddings
+  * vocab.pkl: Vocabulary mapping
+
+6. Usage Instructions
+--------------------
+1. PDF Processing:
+   ```bash
+   python3 scripts/convertPDF.py
+   ```
+
+2. Train CBOW:
+   ```bash
+   python3 scripts/train_cbow.py
+   ```
+
+3. Generate Summaries:
+   ```bash
+   python3 scripts/extractive_summarization.py
+   ```
+
+7. Dependencies
+--------------
+- Python Libraries:
+  * pdf2image
+  * pytesseract
+  * numpy
+  * tqdm
+  * Pillow
+
+- System Requirements:
+  * poppler-utils
+  * tesseract-ocr
+  * Python 3.8+
+  * Sufficient RAM for PDF processing
+
+8. Notes & Limitations
+---------------------
+- Large PDFs may require significant memory during OCR
+- Summary quality depends on OCR accuracy
+- Processing time varies with document size
+- Consider GPU acceleration for larger datasets
+
+For detailed implementation specifics, refer to individual script documentation.
